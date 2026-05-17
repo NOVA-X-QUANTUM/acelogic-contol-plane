@@ -1,8 +1,44 @@
 {
   "name": "@acelogic/identity-compiler",
-  "version": "0.3.0",
+  "version": "0.4.0",
+  "description": "Deterministic identity compilation and governance SDK for ACELOGIC™ autonomous systems infrastructure.",
   "type": "module",
   "main": "src/index.js",
+
+  "keywords": [
+    "acelogic",
+    "kubernetes",
+    "identity",
+    "governance",
+    "deterministic",
+    "autonomous-systems",
+    "admission-control",
+    "runtime-governance",
+    "cloud-infrastructure",
+    "ai-infrastructure"
+  ],
+
+  "license": "SEE LICENSE IN LICENSE",
+
+  "author": "NOVA X Quantum Inc.",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NOVA-X-QUANTUM/acelogic-control-plane.git"
+  },
+
+  "homepage": "https://www.acelogic.ai",
+
+  "engines": {
+    "node": ">=20"
+  },
+
+  "files": [
+    "src"
+  ],
+
+  "main": "src/index.js",
+
   "dependencies": {
     "yaml": "^2.4.5"
   }
