@@ -1,49 +1,122 @@
-# ############################################################
-# #                ACELOGIC PLATFORM v4                      #
-# ############################################################
-# # Module        : RBAC
-# # Environment   : Development
-# # Version       : 4.0.0
-# # Updated       : 2026-05-10
-# #           
-# ############################################################
+############################################################
+# ACELOGIC PLATFORM v4
+############################################################
+# Module        : RBAC
+# Environment   : Development
+# Version       : 4.1.0
+# Updated       : 2026-05-15
+#
+# Purpose:
+# RBAC and namespace configuration for the
+# ACELOGIC™ Local Policy Evaluator.
+#
+# Responsibilities:
+# - admission controller identity
+# - least-privilege policy access
+# - deterministic governance enforcement
+# - secure runtime authorization
+#
+############################################################
+
+############################################################
+# ACELOGIC System Namespace
+############################################################
 
 apiVersion: v1
 kind: Namespace
+
 metadata:
   name: acelogic-system
+
+  labels:
+    app.kubernetes.io/part-of: acelogic-control-plane
+
+    acelogic.ai/system-namespace: "true"
+
+  annotations:
+    acelogic.ai/runtime-governance: "deterministic"
+
 ---
+############################################################
+# Service Account
+############################################################
+
 apiVersion: v1
 kind: ServiceAccount
+
 metadata:
   name: acelogic-evaluator
+
   namespace: acelogic-system
+
+  labels:
+    app.kubernetes.io/name: acelogic-evaluator
+
+    app.kubernetes.io/component: admission-webhook
+
+automountServiceAccountToken: true
+
 ---
+############################################################
+# ClusterRole
+############################################################
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
+
 metadata:
   name: acelogic-evaluator
+
+  labels:
+    app.kubernetes.io/name: acelogic-evaluator
+
 rules:
-  - apiGroups: ["acelogic.ai"]
-    resources: ["agentidentitypolicies"]
-    verbs: ["get", "list", "watch"]
+
+  ##########################################################
+  # AgentIdentityPolicy Access
+  ##########################################################
+
+  - apiGroups:
+      - acelogic.ai
+
+    resources:
+      - agentidentitypolicies
+
+    verbs:
+      - get
+      - list
+      - watch
+
 ---
+############################################################
+# ClusterRoleBinding
+############################################################
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
+
 metadata:
   name: acelogic-evaluator
+
+  labels:
+    app.kubernetes.io/name: acelogic-evaluator
+
 roleRef:
   apiGroup: rbac.authorization.k8s.io
+
   kind: ClusterRole
+
   name: acelogic-evaluator
+
 subjects:
+
   - kind: ServiceAccount
+
     name: acelogic-evaluator
+
     namespace: acelogic-system
 
-
-# ############################################################
-# # End of File: rbac.yaml
-# # Do not modify without code review
-# ############################################################
-
+############################################################
+# End of File: rbac.yaml
+# Do not modify without code review
+############################################################
