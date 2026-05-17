@@ -3,106 +3,332 @@
 // ############################################################
 // # Module        : EVALUATOR
 // # Environment   : Development
-// # Version       : 4.0.1
-// # Updated       : 2026-05-12
-// #            
+// # Version       : 4.1.0
+// # Updated       : 2026-05-15
+// #
+// # Purpose:
+// # Deterministic admission evaluation engine for
+// # ACELOGIC™ runtime governance.
+//
+// # Responsibilities:
+// # - identity verification
+// # - namespace projection validation
+// # - purpose hash enforcement
+// # - continuity-safe admission control
+// # - deterministic fingerprint validation
+// # - lease governance enforcement
+// # - duplicate-runtime prevention
+// #
 // ############################################################
 
-//added fingerprint recomputation and mission trim
-
-
 import crypto from 'crypto';
-import { canonicalize, computeFingerprint } from '../../identity-compiler/src/index.js';
 
-function sha3_256Hex(s) {
-  return crypto.createHash('sha3-256').update(s).digest('hex');
+import {
+  canonicalize,
+  computeFingerprint
+} from '../../identity-compiler/src/index.js';
+
+// ------------------------------------------------------------------
+// SHA3-256 Utility
+// ------------------------------------------------------------------
+
+function sha3_256Hex(input) {
+
+  return crypto
+    .createHash('sha3-256')
+    .update(input)
+    .digest('hex');
 }
 
-function isExpired(iso) {
-  if (!iso) return true;
-  return Date.now() >= new Date(iso).getTime();
-}
+// ------------------------------------------------------------------
+// Lease Expiration Validation
+// ------------------------------------------------------------------
 
-function prefixAllowed(symbolic, gl) {
-  if (!symbolic?.startsWith('#us#.')) return true;
-  if (!gl?.enabled) return false;
-  if (gl.level === 'FULL') return true;
-  if (gl.level === 'RESTRICTED') {
-    return (gl.allowedPrefixes || []).some(p => symbolic.startsWith(p));
+function isExpired(isoTimestamp) {
+
+  if (!isoTimestamp) {
+    return true;
   }
+
+  return (
+    Date.now() >=
+    new Date(isoTimestamp).getTime()
+  );
+}
+
+// ------------------------------------------------------------------
+// Grammar License Enforcement
+// ------------------------------------------------------------------
+
+function prefixAllowed(
+  symbolicNamespace,
+  grammarLicense
+) {
+
+  // Non-symbolic namespaces bypass enforcement.
+
+  if (!symbolicNamespace?.startsWith('#us#.')) {
+    return true;
+  }
+
+  // Grammar enforcement required.
+
+  if (!grammarLicense?.enabled) {
+    return false;
+  }
+
+  // Full symbolic access.
+
+  if (grammarLicense.level === 'FULL') {
+    return true;
+  }
+
+  // Restricted symbolic access.
+
+  if (grammarLicense.level === 'RESTRICTED') {
+
+    return (
+      grammarLicense.allowedPrefixes || []
+    ).some((prefix) =>
+      symbolicNamespace.startsWith(prefix)
+    );
+  }
+
   return false;
 }
 
-export function evaluatePodAgainstPolicy({ pod, policy }) {
-  if (!policy) return { allowed: false, reason: 'MISSING_POLICY' };
+// ------------------------------------------------------------------
+// Deterministic Admission Evaluation
+// ------------------------------------------------------------------
 
-  const labels = pod.metadata?.labels || {};
-  const annotations = pod.metadata?.annotations || {};
-  const spec = policy.spec;
+/**
+ * Evaluates Kubernetes workloads against
+ * deterministic ACELOGIC™ identity policy.
+ */
+export function evaluatePodAgainstPolicy({
+  pod,
+  policy
+}) {
 
-  // ----- 1. Agent ID match -----
-  if (labels['acelogic.ai/agent-id'] !== spec.agentId) {
-    return { allowed: false, reason: 'AGENT_ID_MISMATCH' };
+  // ----------------------------------------------------------------
+  // Policy existence validation
+  // ----------------------------------------------------------------
+
+  if (!policy) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_MISSING_POLICY'
+    };
   }
 
-  // ----- 2. Symbolic namespace match -----
-  if (annotations['acelogic.ai/symbolic-namespace'] !== spec.symbolicNamespace) {
-    return { allowed: false, reason: 'SYMBOLIC_NAMESPACE_MISMATCH' };
+  const labels =
+    pod.metadata?.labels || {};
+
+  const annotations =
+    pod.metadata?.annotations || {};
+
+  const spec =
+    policy.spec;
+
+  // ----------------------------------------------------------------
+  // 1. Agent identity validation
+  // ----------------------------------------------------------------
+
+  if (
+    labels['acelogic.ai/agent-id'] !==
+    spec.agentId
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_AGENT_ID_MISMATCH'
+    };
   }
 
-  // ----- 3. Kubernetes namespace projection check -----
-  if (pod.metadata.namespace !== spec.k8sNamespace) {
-    return { allowed: false, reason: 'K8S_NAMESPACE_MISMATCH' };
+  // ----------------------------------------------------------------
+  // 2. Symbolic namespace validation
+  // ----------------------------------------------------------------
+
+  if (
+    annotations['acelogic.ai/symbolic-namespace'] !==
+    spec.symbolicNamespace
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_SYMBOLIC_NAMESPACE_MISMATCH'
+    };
   }
 
-  // ----- 4. Purpose hash verification (canonicalized mission) -----
-  const suppliedPurposeHash = annotations['acelogic.ai/purpose-hash'];
-  const canonicalMission = spec.mission.trim();
-  const computedPurposeHash = sha3_256Hex(canonicalMission);
-  if (suppliedPurposeHash !== spec.purposeHash || suppliedPurposeHash !== computedPurposeHash) {
-    return { allowed: false, reason: 'PURPOSE_HASH_MISMATCH' };
+  // ----------------------------------------------------------------
+  // 3. Kubernetes namespace projection validation
+  // ----------------------------------------------------------------
+
+  if (
+    pod.metadata.namespace !==
+    spec.k8sNamespace
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_K8S_NAMESPACE_MISMATCH'
+    };
   }
 
-  // ----- 5. Grammar license enforcement -----
-  if (!prefixAllowed(spec.symbolicNamespace, spec.grammarLicense)) {
-    return { allowed: false, reason: 'GRAMMAR_LICENSE_DENIED' };
+  // ----------------------------------------------------------------
+  // 4. Deterministic purpose hash validation
+  // ----------------------------------------------------------------
+
+  const suppliedPurposeHash =
+    annotations['acelogic.ai/purpose-hash'];
+
+  const canonicalMission =
+    spec.mission.trim();
+
+  const computedPurposeHash =
+    sha3_256Hex(canonicalMission);
+
+  if (
+    suppliedPurposeHash !== spec.purposeHash ||
+    suppliedPurposeHash !== computedPurposeHash
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_PURPOSE_HASH_MISMATCH'
+    };
   }
 
-  // ----- 6. Covenant rules (Tier 5) -----
-  if (spec.licenseTier === 'TIER_5' && !spec.covenantHash) {
-    return { allowed: false, reason: 'TIER5_REQUIRES_COVENANT_HASH' };
-  }
-  if (spec.licenseTier !== 'TIER_5' && spec.covenantHash) {
-    return { allowed: false, reason: 'COVENANT_HASH_NOT_ALLOWED_BELOW_TIER5' };
+  // ----------------------------------------------------------------
+  // 5. Grammar license governance
+  // ----------------------------------------------------------------
+
+  if (
+    !prefixAllowed(
+      spec.symbolicNamespace,
+      spec.grammarLicense
+    )
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_GRAMMAR_LICENSE_DENIED'
+    };
   }
 
-  // ----- 7. Fingerprint verification (updated) -----
-  // 
-  // modifed prev version to recompute fingerprint using canonicalized mission and compare with supplied fingerprint
+  // ----------------------------------------------------------------
+  // 6. Continuity governance rules
+  // ----------------------------------------------------------------
+
+  if (
+    spec.licenseTier === 'TIER_5' &&
+    !spec.continuityHash
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_TIER5_REQUIRES_CONTINUITY_HASH'
+    };
+  }
+
+  if (
+    spec.licenseTier !== 'TIER_5' &&
+    spec.continuityHash
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_CONTINUITY_HASH_NOT_ALLOWED_BELOW_TIER5'
+    };
+  }
+
+  // ----------------------------------------------------------------
+  // 7. Deterministic fingerprint recomputation
+  // ----------------------------------------------------------------
+
   const identityMetadataForFingerprint = {
     agentId: spec.agentId,
-    symbolicNamespace: spec.symbolicNamespace,
-    mission: canonicalMission,
-    owner: spec.owner,
+
+    agentClass: spec.agentClass,
+
     licenseTier: spec.licenseTier,
-    grammarLicense: spec.grammarLicense,
+
+    symbolicNamespace:
+      spec.symbolicNamespace,
+
+    k8sNamespace:
+      spec.k8sNamespace,
+
+    mission:
+      canonicalMission,
+
+    owner:
+      spec.owner,
+
+    purposeHash:
+      spec.purposeHash,
+
+    fingerprintVersion:
+      spec.fingerprintVersion
   };
-  const recomputedFingerprint = computeFingerprint(identityMetadataForFingerprint);
-  if (recomputedFingerprint !== spec.fingerprint) {
-    return { allowed: false, reason: 'FINGERPRINT_MISMATCH_INTERNAL' };
+
+  const recomputedFingerprint =
+    computeFingerprint(
+      canonicalize(
+        identityMetadataForFingerprint
+      )
+    );
+
+  if (
+    recomputedFingerprint !==
+    spec.fingerprint
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_FINGERPRINT_MISMATCH_INTERNAL'
+    };
   }
 
-  // ----- 8. State and lease -----
-  if (spec.state !== 'ACTIVE') return { allowed: false, reason: `STATE_${spec.state}` };
-  if (!spec.lease?.expiresAt || isExpired(spec.lease.expiresAt)) {
-    return { allowed: false, reason: 'LEASE_EXPIRED' };
+  // ----------------------------------------------------------------
+  // 8. Runtime state governance
+  // ----------------------------------------------------------------
+
+  if (spec.state !== 'ACTIVE') {
+
+    return {
+      allowed: false,
+      reason: `ACELOGIC_STATE_${spec.state}`
+    };
   }
 
-  return { allowed: true, reason: 'APPROVED' };
+  // ----------------------------------------------------------------
+  // 9. Lease expiration validation
+  // ----------------------------------------------------------------
+
+  if (
+    !spec.lease?.expiresAt ||
+    isExpired(spec.lease.expiresAt)
+  ) {
+
+    return {
+      allowed: false,
+      reason: 'ACELOGIC_LEASE_EXPIRED'
+    };
+  }
+
+  // ----------------------------------------------------------------
+  // Admission approved
+  // ----------------------------------------------------------------
+
+  return {
+    allowed: true,
+    reason: 'ACELOGIC_APPROVED'
+  };
 }
 
 // ############################################################
 // # End of File: evaluator.js
 // # Do not modify without code review
 // ############################################################
-
