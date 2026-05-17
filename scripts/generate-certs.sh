@@ -1,65 +1,159 @@
-# ############################################################
-# #                ACELOGIC PLATFORM v4                      #
-# ############################################################
-# # Module        : GENERATE-CERTS
-# # Environment   : Development
-# # Version       : 4.0.2
-# # Updated       : 2026-05-12
-# #          
-# ############################################################
-
 #!/bin/bash
 
-set -e
-mkdir -p ../local-policy-evaluator/tls
-cd ../local-policy-evaluator/tls
+############################################################
+# ACELOGIC PLATFORM v4
+############################################################
+# Module        : GENERATE-CERTS
+# Environment   : Development
+# Version       : 4.1.0
+# Updated       : 2026-05-15
+#
+# Purpose:
+# Generates local development TLS certificates for the
+# ACELOGIC™ Kubernetes admission webhook.
+#
+# Responsibilities:
+# - create local certificate authority
+# - generate webhook TLS keypair
+# - configure Kubernetes service SANs
+# - provision admission webhook TLS assets
+#
+############################################################
 
-cat > ca-config.json <<EOF
-{
-  "signing": {
-    "default": { "expiry": "8760h" },
-    "profiles": {
-      "webhook": { "expiry": "8760h", "usages": ["signing", "key encipherment", "server auth"] }
-    }
-  }
-}
+set -euo pipefail
+
+# ----------------------------------------------------------
+# Runtime Paths
+# ----------------------------------------------------------
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+TLS_DIR="${ROOT_DIR}/local-policy-evaluator/tls"
+
+mkdir -p "${TLS_DIR}"
+
+cd "${TLS_DIR}"
+
+echo ""
+echo "============================================================"
+echo "ACELOGIC™ TLS Certificate Generation"
+echo "============================================================"
+echo ""
+
+# ----------------------------------------------------------
+# Cleanup Existing Certificates
+# ----------------------------------------------------------
+
+rm -f \
+  ca.key \
+  ca.crt \
+  ca.srl \
+  tls.key \
+  tls.crt \
+  webhook.csr \
+  webhook.ext
+
+# ----------------------------------------------------------
+# Generate Certificate Authority
+# ----------------------------------------------------------
+
+echo "Generating ACELOGIC™ Certificate Authority..."
+
+openssl genrsa \
+  -out ca.key \
+  4096
+
+openssl req \
+  -x509 \
+  -new \
+  -nodes \
+  -key ca.key \
+  -sha256 \
+  -days 3650 \
+  -out ca.crt \
+  -subj "/CN=ACELOGIC-CA"
+
+# ----------------------------------------------------------
+# Generate Webhook Private Key
+# ----------------------------------------------------------
+
+echo "Generating webhook TLS private key..."
+
+openssl genrsa \
+  -out tls.key \
+  4096
+
+# ----------------------------------------------------------
+# Generate Webhook CSR
+# ----------------------------------------------------------
+
+echo "Generating webhook certificate signing request..."
+
+openssl req \
+  -new \
+  -key tls.key \
+  -out webhook.csr \
+  -subj "/CN=acelogic-evaluator.acelogic-system.svc"
+
+# ----------------------------------------------------------
+# Subject Alternative Names
+# ----------------------------------------------------------
+
+cat > webhook.ext <<EOF
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage=digitalSignature,keyEncipherment
+extendedKeyUsage=serverAuth
+
+subjectAltName=@alt_names
+
+[alt_names]
+DNS.1=acelogic-evaluator
+DNS.2=acelogic-evaluator.acelogic-system
+DNS.3=acelogic-evaluator.acelogic-system.svc
+DNS.4=acelogic-evaluator.acelogic-system.svc.cluster.local
 EOF
 
-cat > ca-csr.json <<EOF
-{
-  "CN": "ACELOGIC CA",
-  "key": { "algo": "rsa", "size": 2048 }
-}
-EOF
+# ----------------------------------------------------------
+# Sign Webhook Certificate
+# ----------------------------------------------------------
 
-openssl genrsa -out ca-key.pem 2048
-openssl req -x509 -new -nodes -key ca-key.pem -days 365 -out ca.pem -subj "/CN=ACELOGIC-CA"
+echo "Signing webhook certificate..."
 
-cat > webhook-csr.json <<EOF
-{
-  "CN": "acelogic-evaluator.acelogic-system.svc",
-  "key": { "algo": "rsa", "size": 2048 },
-  "hosts": [
-    "acelogic-evaluator",
-    "acelogic-evaluator.acelogic-system",
-    "acelogic-evaluator.acelogic-system.svc",
-    "acelogic-evaluator.acelogic-system.svc.cluster.local"
-  ]
-}
-EOF
+openssl x509 \
+  -req \
+  -in webhook.csr \
+  -CA ca.crt \
+  -CAkey ca.key \
+  -CAcreateserial \
+  -out tls.crt \
+  -days 3650 \
+  -sha256 \
+  -extfile webhook.ext
 
-openssl genrsa -out webhook-key.pem 2048
-openssl req -new -key webhook-key.pem -out webhook.csr -config <(cat webhook-csr.json)
-openssl x509 -req -in webhook.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out webhook.pem -days 365 -extensions v3_req -extfile <(echo -e "[v3_req]\nsubjectAltName=DNS:acelogic-evaluator,DNS:acelogic-evaluator.acelogic-system,DNS:acelogic-evaluator.acelogic-system.svc,DNS:acelogic-evaluator.acelogic-system.svc.cluster.local")
+# ----------------------------------------------------------
+# Permissions
+# ----------------------------------------------------------
 
-cp webhook.pem tls.crt
-cp webhook-key.pem tls.key
-cp ca.pem ca.crt
+chmod 600 tls.key
+chmod 644 tls.crt
+chmod 644 ca.crt
 
-echo "Certificates generated"
+# ----------------------------------------------------------
+# Output Summary
+# ----------------------------------------------------------
 
-# ############################################################
-# # End of File: generate-certs.sh
-# # Do not modify without code review
-# ############################################################
+echo ""
+echo "============================================================"
+echo "ACELOGIC™ TLS Assets Generated"
+echo "============================================================"
+echo "CA Certificate:        ${TLS_DIR}/ca.crt"
+echo "Webhook Certificate:   ${TLS_DIR}/tls.crt"
+echo "Webhook Private Key:   ${TLS_DIR}/tls.key"
+echo "============================================================"
+echo ""
 
+############################################################
+# End of File: generate-certs.sh
+# Do not modify without code review
+############################################################
