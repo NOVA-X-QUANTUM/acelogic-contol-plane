@@ -1,44 +1,122 @@
-# ############################################################
-# #                ACELOGIC PLATFORM v4                      #
-# ############################################################
-# # Module        : VALIDATING-WEBHOOK
-# # Environment   : Development
-# # Version       : 4.0.0
-# # Updated       : 2026-05-10
-# #            
-# ############################################################
-
-
-#namespaceSelector added
+############################################################
+# ACELOGIC PLATFORM v4
+############################################################
+# Module        : VALIDATING-WEBHOOK
+# Environment   : Development
+# Version       : 4.1.0
+# Updated       : 2026-05-15
+#
+# Purpose:
+# Kubernetes ValidatingWebhookConfiguration for the
+# ACELOGIC™ Local Policy Evaluator.
+#
+# Responsibilities:
+# - deterministic admission enforcement
+# - identity-aware workload validation
+# - continuity-safe execution governance
+# - fail-closed runtime authorization
+# - duplicate-runtime prevention
+#
+############################################################
 
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
+
 metadata:
   name: acelogic-evaluator
+
+  labels:
+    app.kubernetes.io/name: acelogic-evaluator
+
+    app.kubernetes.io/component: admission-webhook
+
+    app.kubernetes.io/part-of: acelogic-control-plane
+
 webhooks:
-- name: evaluator.acelogic.ai
-  admissionReviewVersions: ["v1"]
-  sideEffects: None
-  timeoutSeconds: 5
-  failurePolicy: Fail
-  namespaceSelector:
-    matchLabels:
-      acelogic.ai/enabled: "true"
-  clientConfig:
-    service:
-      name: acelogic-evaluator
-      namespace: acelogic-system
-      path: "/validate"
-    caBundle: <BASE64_ENCODED_CA_CERT>
-  rules:
-  - operations: ["CREATE","UPDATE"]
-    apiGroups: [""]
-    apiVersions: ["v1"]
-    resources: ["pods"]
 
-        
-# ############################################################
-# # End of File: validating-webhook.yaml
-# # Do not modify without code review
-# ############################################################
+  ##########################################################
+  # ACELOGIC Admission Webhook
+  ##########################################################
 
+  - name: evaluator.acelogic.ai
+
+    ########################################################
+    # Admission API Compatibility
+    ########################################################
+
+    admissionReviewVersions:
+      - v1
+
+    sideEffects: None
+
+    timeoutSeconds: 5
+
+    ########################################################
+    # Fail-Closed Governance
+    ########################################################
+
+    failurePolicy: Fail
+
+    matchPolicy: Equivalent
+
+    reinvocationPolicy: Never
+
+    ########################################################
+    # Namespace Enforcement Boundary
+    ########################################################
+
+    namespaceSelector:
+
+      matchLabels:
+        acelogic.ai/enforced: "true"
+
+    ########################################################
+    # Admission Service Endpoint
+    ########################################################
+
+    clientConfig:
+
+      service:
+        name: acelogic-evaluator
+
+        namespace: acelogic-system
+
+        path: "/validate"
+
+        port: 443
+
+      ######################################################
+      # TLS Trust Bundle
+      ######################################################
+
+      caBundle: <BASE64_ENCODED_CA_CERT>
+
+    ########################################################
+    # Admission Rules
+    ########################################################
+
+    rules:
+
+      - operations:
+          - CREATE
+          - UPDATE
+
+        apiGroups:
+          - ""
+
+        apiVersions:
+          - v1
+
+        resources:
+          - pods
+
+    ########################################################
+    # Admission Scope
+    ########################################################
+
+    scope: "Namespaced"
+
+############################################################
+# End of File: validating-webhook.yaml
+# Do not modify without code review
+############################################################
