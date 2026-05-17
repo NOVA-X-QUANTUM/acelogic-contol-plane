@@ -1,28 +1,74 @@
-# ############################################################
-# #                ACELOGIC PLATFORM v4                      #
-# ############################################################
-# # Module        : US-ENTERPRISE-PARTNER-AI
-# # Environment   : Development
-# # Version       : 4.0.0
-# # Updated       : 2026-05-10
-# #        
-# ############################################################
+############################################################
+# ACELOGIC PLATFORM v4
+############################################################
+# Module        : US-ENTERPRISE-PARTNER-AI
+# Environment   : Development
+# Version       : 4.1.0
+# Updated       : 2026-05-15
+#
+# Purpose:
+# Kubernetes namespace projection for ACELOGIC™
+# symbolic identity enforcement and deterministic
+# runtime governance.
+############################################################
 
 apiVersion: v1
 kind: Namespace
+
 metadata:
   name: us-enterprise-partner-ai
+
   labels:
+
+    ########################################################
+    # ACELOGIC Enforcement
+    ########################################################
+
     acelogic.ai/enforced: "true"
+
+    ########################################################
+    # Runtime Classification
+    ########################################################
+
+    acelogic.ai/runtime-class: "enterprise"
+
+    acelogic.ai/governance-tier: "tier-4"
+
+    ########################################################
+    # Environment Metadata
+    ########################################################
+
+    environment: "development"
+
+    infrastructure-role: "autonomous-runtime"
+
   annotations:
+
+    ########################################################
+    # Symbolic Namespace Projection
+    ########################################################
+
     acelogic.ai/symbolic-namespace: "#us#.enterprise.partner.ai"
-# 
 
+    ########################################################
+    # Governance Controls
+    ########################################################
 
+    acelogic.ai/continuity-enforcement: "enabled"
 
+    acelogic.ai/admission-mode: "fail-closed"
+
+    acelogic.ai/runtime-governance: "deterministic"
+
+    ########################################################
+    # Continuity Metadata
+    ########################################################
+
+    acelogic.ai/continuity-class: "enterprise"
+
+    acelogic.ai/identity-boundary: "enabled"
 
 ############################################################
-# # End of File: us-enterprise-partner-ai.yaml
-# # Do not modify without code review
-# ############################################################
-
+# End of File: us-enterprise-partner-ai.yaml
+# Do not modify without code review
+############################################################
