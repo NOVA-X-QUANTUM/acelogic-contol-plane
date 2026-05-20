@@ -1,14 +1,16 @@
 <!--
 ##############################################################################
-# ACELOGIC PLATFORM v4.1.0
-# Module        : README
+# ACELOGIC CONTROL PLANE
+# Public Reference Architecture
+# Version       : 4.2.0
 # Environment   : Production
-# Updated       : 2026-05-15
+# Classification: Public Infrastructure Reference
+# Updated       : 2026-05-20
 ##############################################################################
 -->
 
 # 🧠 ACELOGIC™ Control Plane
-## Deterministic Identity & Execution Governance for Distributed AI Infrastructure
+## The Deterministic Identity & Continuity Layer for Autonomous Systems
 
 > Identity-aware runtime governance for autonomous systems operating across Kubernetes, cloud, edge, and AI-native infrastructure.
 
@@ -18,11 +20,19 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.1.0-blue.svg" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-4.2.0-blue.svg" alt="Version"/>
   <img src="https://img.shields.io/badge/environment-production-green.svg" alt="Production"/>
   <img src="https://img.shields.io/badge/governance-fail--closed-red.svg" alt="Fail Closed"/>
   <img src="https://img.shields.io/badge/license-source--available-lightgrey.svg" alt="License"/>
 </p>
+
+---
+
+> ## Public Reference Implementation
+>
+> This repository is the public reference implementation of the ACELOGIC™ deterministic governance control plane.
+>
+> Sovereign continuity infrastructure, continuity arbitration systems, deterministic recovery infrastructure, and enterprise continuity modules remain private.
 
 ---
 
@@ -38,10 +48,12 @@ This production-grade implementation introduces:
 - canonical workload validation
 - policy-bound execution control
 - runtime continuity enforcement
+- split-brain protection
+- fail-closed execution governance
 
 directly into Kubernetes-native infrastructure.
 
-ACELOGIC™ operates as a decentralized control plane for autonomous systems running across:
+ACELOGIC™ operates as a decentralized governance control plane for autonomous systems running across:
 
 - Kubernetes environments
 - cloud infrastructure
@@ -49,6 +61,30 @@ ACELOGIC™ operates as a decentralized control plane for autonomous systems run
 - distributed AI systems
 - AI-native runtime environments
 - AI-RAN / telecom infrastructure
+
+---
+
+# 🚨 The Infrastructure Problem
+
+Modern orchestration systems restore workloads.
+
+They do not preserve deterministic execution identity.
+
+As autonomous systems evolve into persistent runtime actors, infrastructure must determine:
+
+- whether execution authority remains valid
+- whether another runtime already resumed execution
+- whether continuity has diverged
+- whether execution paths have forked
+- whether the workload is canonical
+
+Traditional orchestration systems can unintentionally permit duplicate autonomous runtimes across distributed infrastructure.
+
+This creates split-brain execution:
+
+multiple concurrent workloads operating under conflicting authority states.
+
+ACELOGIC™ introduces deterministic governance directly into the runtime admission path before execution is permitted.
 
 ---
 
@@ -77,6 +113,36 @@ ACELOGIC™ introduces deterministic identity governance directly into the execu
 
 ---
 
+# 🔬 Research & Evaluation
+
+This public repository is intended for:
+
+- infrastructure research
+- Kubernetes-native governance experimentation
+- distributed systems evaluation
+- AI runtime validation
+- cloud-native orchestration testing
+- GKE evaluation and experimentation
+- enterprise infrastructure evaluation
+
+The repository enables engineers and institutions to validate deterministic runtime governance concepts within Kubernetes-native infrastructure environments.
+
+---
+
+# 👥 Intended Audience
+
+This repository is designed for:
+
+- Kubernetes platform engineers
+- distributed systems researchers
+- cloud infrastructure teams
+- enterprise architects
+- AI infrastructure operators
+- telecom infrastructure evaluators
+- orchestration governance researchers
+
+---
+
 # 📦 Components
 
 | Component | Description |
@@ -88,7 +154,7 @@ ACELOGIC™ introduces deterministic identity governance directly into the execu
 | **Metrics & Audit Pipeline** | Prometheus-compatible telemetry and structured audit logging for enforcement visibility. |
 | **Example Policies** | Enterprise policy examples, namespace projections, and validation test workloads. |
 
-> **Note:** The proprietary ACELOGIC™ Conflict Resolver and enterprise Continuity Engine are not included in this public reference implementation.
+> **Note:** The proprietary ACELOGIC™ Continuity Engine, Conflict Resolver, Arbitration Systems, and Sovereign Recovery Infrastructure are not included in this public reference implementation.
 
 ---
 
@@ -96,7 +162,7 @@ ACELOGIC™ introduces deterministic identity governance directly into the execu
 
 ACELOGIC™ follows a decentralized Git-driven policy distribution architecture.
 
-Policies are distributed through standard Kubernetes-native synchronization mechanisms while enforcement occurs locally at cluster admission time.
+Policies are distributed through Kubernetes-native synchronization mechanisms while enforcement occurs locally at cluster admission time.
 
 This architecture enables:
 
@@ -105,6 +171,7 @@ This architecture enables:
 - continuity-aware orchestration
 - fail-closed execution control
 - distributed execution integrity
+- split-brain prevention
 
 without centralized runtime dependencies.
 
@@ -152,10 +219,11 @@ AI Agents / Autonomous Workloads
 ┌────────────────────────────────────┐
 │      ACELOGIC™ Control Plane       │
 │────────────────────────────────────│
-│ • Identity Verification            │
+│ • Deterministic Identity           │
 │ • Authority Validation             │
 │ • Continuity Enforcement           │
 │ • Duplicate Runtime Prevention     │
+│ • Split-Brain Protection           │
 │ • Lease Validation                 │
 │ • SAFE_MODE Enforcement            │
 │ • Runtime Governance               │
@@ -169,7 +237,7 @@ AI Agents / Autonomous Workloads
 └────────────────────────────────────┘
                 │
                 ▼
-         Infrastructure Layer
+ Cloud • Edge • AI-RAN • Distributed Infrastructure
 ```
 
 ---
@@ -185,6 +253,8 @@ Every workload must validate:
 - continuity lineage
 - active execution authority
 - valid execution lease
+- namespace continuity
+- policy compliance
 
 before execution is permitted.
 
@@ -194,6 +264,7 @@ If continuity validation fails:
 - SAFE_MODE may be enforced
 - mutation authority is revoked
 - duplicate execution paths are rejected
+- conflicting authority states are blocked
 
 This prevents:
 
@@ -202,6 +273,7 @@ This prevents:
 - continuity divergence
 - conflicting authority states
 - unauthorized workload resurrection
+- runtime fork attempts
 
 ---
 
@@ -253,6 +325,7 @@ The architecture enables:
 - deterministic runtime governance
 - distributed identity propagation
 - canonical execution preservation
+- continuity-aware failover
 
 across cloud, edge, and telecom infrastructure.
 
@@ -287,6 +360,7 @@ All admission decisions are logged in structured JSON format including:
 - denial reason
 - identity fingerprint
 - continuity validation result
+- lease validation status
 
 ---
 
@@ -307,6 +381,7 @@ Validation scenarios include:
 - duplicate runtime detection
 - continuity mismatch
 - unauthorized execution recovery
+- split-brain rejection
 - fork-attempt rejection
 
 ---
@@ -326,7 +401,7 @@ acelogic-devops/
 └── README.md
 ```
 
-> Proprietary enterprise continuity modules are not included in this public repository.
+> Proprietary enterprise continuity infrastructure is not included in this public repository.
 
 ---
 
@@ -385,16 +460,19 @@ For full validation:
 | SAFE_MODE Enforcement | ✅ Implemented |
 | Namespace Projection | ✅ Implemented |
 | Duplicate Runtime Prevention | ✅ Implemented |
+| Split-Brain Protection | ✅ Implemented |
 | Continuity Validation | ✅ Implemented |
 | Metrics & Telemetry | ✅ Implemented |
 | Structured Audit Logging | ✅ Implemented |
 | Conflict Resolution Engine | ⚠️ Proprietary |
+| Deterministic Recovery | ⚠️ Proprietary |
+| Sovereign Continuity Systems | ⚠️ Proprietary |
 
 ---
 
 # 🌐 Public Reference Architecture
 
-This repository serves as the public reference implementation for the ACELOGIC™ deterministic identity control plane.
+This repository serves as the public reference implementation for the ACELOGIC™ deterministic governance control plane.
 
 Included in this public repository:
 
@@ -414,8 +492,9 @@ This public implementation exists for:
 - runtime governance validation
 - autonomous systems experimentation
 - Kubernetes integration testing
+- enterprise infrastructure evaluation
 
-For enterprise continuity infrastructure, distributed reconciliation, and advanced deterministic recovery systems, contact ACELOGIC™.
+For enterprise continuity infrastructure, distributed reconciliation systems, deterministic recovery systems, or sovereign runtime governance infrastructure, contact ACELOGIC™.
 
 ---
 
@@ -429,6 +508,16 @@ This repository is source-available for:
 - educational reference
 
 Redistribution, commercial deployment, or derivative production usage requires explicit permission from ACELOGIC™.
+
+This repository does NOT grant rights to:
+
+- sovereign continuity systems
+- continuity arbitration infrastructure
+- deterministic recovery systems
+- lineage reconciliation systems
+- enterprise continuity modules
+
+These systems remain proprietary to NOVA X Quantum™.
 
 See `LICENSE` for details.
 
@@ -444,9 +533,15 @@ Core infrastructure layers include:
 - Machine Grammar #us#. → authority resolution
 - ACEPLACE™ → governed execution runtime
 - Continuity Notary™ → execution certification
-- NOVA 1000™ → structured reasoning architecture
 
-Together these systems establish deterministic execution infrastructure for autonomous systems operating across cloud, edge, Kubernetes, and AI-native environments.
+Together these systems establish deterministic execution infrastructure for autonomous systems operating across:
+
+- Kubernetes
+- cloud infrastructure
+- edge environments
+- AI-native runtime systems
+- telecom orchestration
+- sovereign execution environments
 
 ---
 
