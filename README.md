@@ -113,7 +113,7 @@ ACELOGIC™ introduces deterministic identity governance directly into the execu
 
 ---
 
-# 🔬 Research & Evaluation
+# Research & Evaluation
 
 This public repository is intended for:
 
@@ -158,7 +158,7 @@ This repository is designed for:
 
 ---
 
-# 🏛️ Architecture Overview
+# Architecture Overview
 
 ACELOGIC™ follows a decentralized Git-driven policy distribution architecture.
 
@@ -177,7 +177,7 @@ without centralized runtime dependencies.
 
 ---
 
-# 🔁 System Flow
+# System Flow
 
 ```text
 ACELOGIC PROTOCOL LAYER
@@ -210,7 +210,7 @@ ACELOGIC PROTOCOL LAYER
 
 ---
 
-# 🧭 Architecture Boundary Diagram
+# Architecture Boundary Diagram
 
 ```text
 AI Agents / Autonomous Workloads
@@ -523,7 +523,7 @@ See `LICENSE` for details.
 
 ---
 
-# 🌍 About NOVA X Quantum Inc. (NXQ)
+# 🌎 About NOVA X Quantum Inc. (NXQ)
 
 NXQ develops deterministic infrastructure for autonomous systems.
 
