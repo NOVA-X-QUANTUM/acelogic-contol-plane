@@ -562,7 +562,7 @@ ACELOGIC™ restores execution integrity.
 
 ---
 
-# 🧠 ACELOGIC™
+# ACELOGIC™
 
 Deterministic Infrastructure for Autonomous Systems
 
