@@ -464,9 +464,12 @@ For full validation:
 | Continuity Validation | ✅ Implemented |
 | Metrics & Telemetry | ✅ Implemented |
 | Structured Audit Logging | ✅ Implemented |
+| Cluster-local Policy Evaluation | ✅ Implemented |
+| Kubernetes Admission Webhooks | ✅ Implemented |
 | Conflict Resolution Engine | ⚠️ Proprietary |
-| Deterministic Recovery | ⚠️ Proprietary |
+| Deterministic Recovery Infrastructure | ⚠️ Proprietary |
 | Sovereign Continuity Systems | ⚠️ Proprietary |
+| Distributed Arbitration Systems | ⚠️ Proprietary |
 
 ---
 
