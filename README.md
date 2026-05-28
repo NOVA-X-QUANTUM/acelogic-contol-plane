@@ -473,6 +473,37 @@ For full validation:
 
 ---
 
+# Compliance & Governance Model
+
+ACELOGIC™ introduces compliance-aware runtime governance directly into autonomous infrastructure execution paths.
+
+Governance policies may be derived from:
+
+- enterprise compliance frameworks
+- telecom governance requirements
+- financial regulatory systems
+- healthcare data controls
+- sovereign infrastructure policies
+- defense execution constraints
+- jurisdiction-aware deployment policies
+
+The governance layer enables policy-bound execution enforcement for autonomous runtime systems operating across regulated infrastructure environments.
+
+Examples include:
+
+- SOC 2 / ISO 27001
+- HIPAA
+- GDPR
+- DORA
+- AML / KYC
+- NIS2
+- telecom spectrum governance
+- sovereignty-aware execution policies
+
+Compliance enforcement operates through deterministic admission governance, execution policy validation, structured audit traceability, and fail-closed runtime enforcement.
+
+---
+
 # Public Reference Architecture
 
 This repository serves as the public reference implementation for the ACELOGIC™ deterministic governance control plane.
